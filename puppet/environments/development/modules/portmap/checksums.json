@@ -1,0 +1,19 @@
+{
+  "Contributors.txt": "2af65101e9a2783169c2ec1eb3b31eb6",
+  "LICENSE.txt": "3b83ef96387f14655fc854ddc3c6bd57",
+  "README.md": "eb5b919e5a4fb43a5ef629ea3cd09718",
+  "manifests/debian/config.pp": "9b4fe95f3685f38fa8d8be599942afe3",
+  "manifests/debian/packages.pp": "43c4616b0c781d798e853ea3ead38966",
+  "manifests/debian/services.pp": "5ae2f8b13034847a5ae892fdf5217bcd",
+  "manifests/debian.pp": "6be478ce94a704144918302f1eea4b7d",
+  "manifests/init.pp": "c85a3874892c00988a0170d7f364147e",
+  "manifests/openbsd/services.pp": "0e0bea3712162c51252a3c486d6dccb7",
+  "manifests/openbsd.pp": "45badfea8a7e4a5cfdf7d4454c1ad5ba",
+  "manifests/params.pp": "b5d1955916a120d44ec7291408554f38",
+  "manifests/rhel/packages.pp": "25a368545a7432b9aef94c99ef940514",
+  "manifests/rhel/services.pp": "35eabec89e299ae32f2927a683fb0aae",
+  "manifests/rhel.pp": "30c971080ee636f5e84daf91eeb97e84",
+  "metadata.json": "f3ecb869b332718e7fe7a271acfd6220",
+  "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
+  "tests/init.pp": "9f42af654b4b0280c326d5ab752adcf5"
+}

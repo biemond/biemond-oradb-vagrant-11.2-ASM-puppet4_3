@@ -1,0 +1,44 @@
+{
+  "name": "jbeard-portmap",
+  "version": "0.1.12",
+  "author": "jbeard",
+  "summary": "Module controlling the portmap/rpcbind daemon.",
+  "license": "Apache-2.0",
+  "source": "https://github.com/jbeard6/jbeard-portmap",
+  "project_page": "https://github.com/jbeard6/jbeard-portmap",
+  "issues_url": "https://github.com/jbeard6/jbeard-portmap/issues",
+  "description": "This module installs and controls the execution of the portmap/rpcbind daemon.",
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "7.0"
+      ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "12.04",
+        "13.10",
+        "14.04"
+      ]
+    },
+    {
+      "operatingsystem": "OpenBSD",
+      "operatingsystemrelease": [
+  
+      ]
+    }
+  ],
+  "dependencies": [
+    {"name":"puppetlabs/stdlib","version_requirement":">= 4.0.0 <5.0.0"}
+  ]
+}
