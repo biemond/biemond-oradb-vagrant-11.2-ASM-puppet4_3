@@ -28,7 +28,6 @@
 #     swapfile => '/mnt/swap.55',
 #   }
 #
-#
 # == Authors
 #    @petems - Peter Souter
 #
@@ -40,6 +39,9 @@ define swap_file::files (
   $options       = 'defaults',
   $timeout       = 300,
   $cmd           = 'dd',
+  $resize_existing = false,
+  $resize_margin   = '50MB',
+  $resize_verbose  = false,
 )
 {
   # Parameter validation
@@ -49,6 +51,37 @@ define swap_file::files (
   validate_bool($add_mount)
 
   if $ensure == 'present' {
+
+    if ($resize_existing and $::swapfile_sizes) {
+
+      if (is_hash($::swapfile_sizes)) {
+
+        if (has_key($::swapfile_sizes,$swapfile)) {
+          ::swap_file::resize { $swapfile:
+            swapfile_path          => $swapfile,
+            margin                 => $resize_margin,
+            expected_swapfile_size => $swapfilesize,
+            actual_swapfile_size   => $::swapfile_sizes[$swapfile],
+            verbose                => $resize_verbose,
+            before                 => Exec["Create swap file ${swapfile}"],
+          }
+        }
+
+      } else {
+        $existing_swapfile_size = swap_file_size_from_csv($swapfile,$::swapfile_sizes_csv)
+        if ($existing_swapfile_size) {
+          ::swap_file::resize { $swapfile:
+            swapfile_path          => $swapfile,
+            margin                 => $resize_margin,
+            expected_swapfile_size => $swapfilesize,
+            actual_swapfile_size   => $existing_swapfile_size,
+            verbose                => $resize_verbose,
+            before                 => Exec["Create swap file ${swapfile}"],
+          }
+        }
+      }
+    }
+
     exec { "Create swap file ${swapfile}":
       creates => $swapfile,
       timeout => $timeout,
@@ -70,10 +103,9 @@ define swap_file::files (
       mode    => '0600',
       require => Exec["Create swap file ${swapfile}"],
     }
-    exec { "Attach swap file ${swapfile}":
-      command => "/sbin/mkswap ${swapfile} && /sbin/swapon ${swapfile}",
-      require => File[$swapfile],
-      unless  => "/sbin/swapon -s | grep ${swapfile}",
+    swap_file { $swapfile:
+      ensure  => 'present',
+      require => File[$swapfile]
     }
     if $add_mount {
       mount { $swapfile:
@@ -83,24 +115,22 @@ define swap_file::files (
         options => $options,
         dump    => 0,
         pass    => 0,
-        require => Exec["Attach swap file ${swapfile}"],
+        require => Swap_file[$swapfile],
       }
     }
   }
   elsif $ensure == 'absent' {
-    exec { "Detach swap file ${swapfile}":
-      command => "/sbin/swapoff ${swapfile}",
-      onlyif  => "/sbin/swapon -s | grep ${swapfile}",
+    swap_file { $swapfile:
+      ensure  => 'absent',
     }
     file { $swapfile:
       ensure  => absent,
       backup  => false,
-      require => Exec["Detach swap file ${swapfile}"],
+      require => Swap_file[$swapfile],
     }
     mount { $swapfile:
       ensure => absent,
       device => $swapfile,
     }
   }
-
 }
