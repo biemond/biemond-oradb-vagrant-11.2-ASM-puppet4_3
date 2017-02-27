@@ -278,7 +278,7 @@ oradb::database{ &#39;oraDb&#39;:
         <span class='name'>version</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt>Enum['11.2', '12.1', '12.2']</tt>)</span>
       
       
         <em class="default">(defaults to: <tt>lookup(&#39;oradb::version&#39;)</tt>)</em>
@@ -878,7 +878,13 @@ oradb::database{ &#39;oraDb&#39;:
 280
 281
 282
-283</pre>
+283
+284
+285
+286
+287
+288
+289</pre>
       </td>
       <td>
         <pre class="code"><span class="info file"># File 'manifests/database.pp', line 96</span>
@@ -886,7 +892,7 @@ oradb::database{ &#39;oraDb&#39;:
 define oradb::database(
   String $oracle_base                                             = undef,
   String $oracle_home                                             = undef,
-  String $version                                                 = lookup(&#39;oradb::version&#39;),
+  Enum[&#39;11.2&#39;, &#39;12.1&#39;, &#39;12.2&#39;] $version                           = lookup(&#39;oradb::version&#39;),
   String $user                                                    = lookup(&#39;oradb::user&#39;),
   String $group                                                   = lookup(&#39;oradb::group&#39;),
   String $download_dir                                            = lookup(&#39;oradb::download_dir&#39;),
@@ -919,9 +925,6 @@ define oradb::database(
   String $puppet_download_mnt_point                               = lookup(&#39;oradb::module_mountpoint&#39;),
 )
 {
-  if ( $version in lookup(&#39;oradb::database_versions&#39;) == false ) {
-    fail(&#39;Unrecognized version for oradb::database&#39;)
-  }
 
   $supported_db_kernels = join( lookup(&#39;oradb::kernels&#39;), &#39;|&#39;)
   if ( $::kernel in $supported_db_kernels == false){
@@ -1044,7 +1047,11 @@ define oradb::database(
         }
       }
     } else {
-      $command = &quot;${elevation_prefix}${oracle_home}/bin/dbca -silent -responseFile ${download_dir}/database_${sanitized_title}.rsp${elevation_suffix}&quot;
+      if ( $version == &#39;12.2&#39; ) {
+        $command = &quot;${elevation_prefix}${oracle_home}/bin/dbca -silent -createDatabase -responseFile ${download_dir}/database_${sanitized_title}.rsp${elevation_suffix}&quot;
+      } else {
+        $command = &quot;${elevation_prefix}${oracle_home}/bin/dbca -silent -responseFile ${download_dir}/database_${sanitized_title}.rsp${elevation_suffix}&quot;
+      }
     }
     exec { &quot;oracle database ${title}&quot;:
       command     =&gt; $command,
@@ -1058,8 +1065,13 @@ define oradb::database(
       logoutput   =&gt; true,
     }
   } elsif $action == &#39;delete&#39; {
+    if ( $version == &#39;12.2&#39; ) {
+      $command = &quot;${oracle_home}/bin/dbca -silent -deleteDatabase -sourceDB ${db_name} -sysDBAUserName sys -sysDBAPassword ${sys_password}&quot;
+    } else {
+      $command = &quot;${oracle_home}/bin/dbca -silent -responseFile ${download_dir}/database_${sanitized_title}.rsp&quot;
+    }
     exec { &quot;oracle database ${title}&quot;:
-      command     =&gt; &quot;${oracle_home}/bin/dbca -silent -responseFile ${download_dir}/database_${sanitized_title}.rsp&quot;,
+      command     =&gt; $command,
       onlyif      =&gt; &quot;ls ${oracle_base}/admin/${db_name}&quot;,
       timeout     =&gt; 0,
       path        =&gt; $exec_path,
@@ -1078,7 +1090,7 @@ define oradb::database(
 </div>
 
       <div id="footer">
-  Generated on Sat Feb 25 19:13:43 2017 by
+  Generated on Sun Feb 26 10:48:45 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.8 (ruby-2.3.1).
 </div>

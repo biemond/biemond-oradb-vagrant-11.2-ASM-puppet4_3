@@ -127,6 +127,7 @@ define oradb::database(
   Optional[String] $cluster_nodes                                 = undef, # comma separated list with at first the local and at second the remode host e.g. "racnode1,racnode2"
   Boolean $container_database                                     = false, # 12.1 feature for pluggable database
   String $puppet_download_mnt_point                               = lookup('oradb::module_mountpoint'),
+  Boolean $automatic_memory_management                            = true, # for 12.2 , choose false when more than 4gb memory
 )
 {
 
@@ -208,7 +209,8 @@ define oradb::database(
                       'database_type'             => $database_type,
                       'memory_total'              => $memory_total,
                       'db_port'                   => $db_port,
-                      'container_database'        => $container_database }),
+                      'container_database'        => $container_database,
+                      'automatic_memory_management' => $automatic_memory_management }),
       mode    => '0770',
       owner   => $user,
       group   => $group,
